@@ -1,0 +1,42 @@
+version: "3"
+
+networks:
+  demo-net:
+
+services:
+  # Database Service (Postgres)
+  db:
+    image: postgres:latest
+    container_name: postgresql-container
+    restart: always
+    #volumes:
+    #  - postgres-data:/var/lib/postgresql/data
+    networks:
+      - demo-net
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: articledb
+      PGDATA: /var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 1m
+      timeout: 10s
+      retries: 2
+
+  # Article Service
+  app:
+    image: omernaci/demo:latest
+    container_name: article-app
+    ports:
+      - "8080:8080"
+    networks:
+      - demo-net
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db/articledb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+    depends_on:
+      - db
