@@ -47,6 +47,11 @@ public class Customer {
         this.phoneNumber = phoneNumber;
     }
 
+    public Customer(Long id, CustomerType customerType) {
+        this.id = id;
+        this.customerType = customerType;
+    }
+
     public Long getId() {
         return id;
     }

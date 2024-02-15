@@ -21,9 +21,14 @@ import io.cucumber.junit.CucumberOptions;
 import org.junit.runner.RunWith;
 
 @RunWith(Cucumber.class)
-@CucumberOptions(features = "src/test/resources/features",
-    glue = "com.omernaci.accountcore.steps",
-    plugin = {"pretty", "html:target/cucumber-reports/cucumberReport.html"},
-    tags = "not @Skip")
-public class CucumberTestRunner {
+@CucumberOptions(
+        features = "src/test/resources/features",
+        glue = "com.omernaci.accountcore.steps",
+        snippets = CucumberOptions.SnippetType.CAMELCASE,
+        plugin = {"pretty", "html:target/cucumber-reports/cucumber-pretty.html",
+                "json:target/cucumber-reports/CucumberTestReport.json",
+                "rerun:target/cucumber-reports/rerun.txt"},
+        tags = "not @Skip"
+)
+public class CucumberTest {
 }

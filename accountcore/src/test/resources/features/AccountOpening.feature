@@ -1,10 +1,16 @@
 Feature: Account Service
 
-  Scenario: Opening a valid account
-    Given a customer with ID "123"
-    When an account is opened with currency "USD" and name "Savings"
-    Then the account is successfully created
+  Background:
+    Given I have an AccountService
 
-  Scenario: Attempting to open an account for a corporate customer
-    Given a customer with ID "456" of type "CORPORATE"
-    Then an account creation exception is thrown
+  Scenario Outline: Open a new account within yhe account limit
+    Given the customer with id <customerId> is a "<customerType>" customer
+    And the customer has <existingAccountCount> existing account(s)
+    When the customer opens a new account using AccountService
+    Then the account should be created successfully if eligible
+    But an exception should be thrown if not eligible
+    Examples:
+      | customerId | customerType | existingAccountCount |
+      | 67890      | CORPORATE    | 0                    |
+      | 12345      | INDIVIDUAL   | 4                    |
+      | 24680      | INDIVIDUAL   | 2                    |
