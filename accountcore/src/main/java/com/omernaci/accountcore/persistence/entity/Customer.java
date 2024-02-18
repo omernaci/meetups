@@ -52,6 +52,10 @@ public class Customer {
         this.customerType = customerType;
     }
 
+    public Customer() {
+
+    }
+
     public Long getId() {
         return id;
     }

@@ -24,6 +24,7 @@ import com.omernaci.accountcore.persistence.repository.AccountRepository;
 import com.omernaci.accountcore.persistence.repository.CustomerRepository;
 import com.omernaci.accountcore.service.AccountService;
 import com.omernaci.accountcore.service.dto.AccountDto;
+import java.math.BigDecimal;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -45,13 +46,17 @@ public class AccountServiceImpl implements AccountService {
         Customer customer = customerRepository.findById(accountDto.customerId())
             .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
 
-        if (customer.getCustomerType() == CustomerType.CORPORATE) {
+        if (customer.getCustomerType() == CustomerType.CORPORATE && accountDto.currency().equals("EUR")) {
             throw new AccountCreateException("Corporate customers are not eligible for account opening");
         }
 
         int accountCount = accountRepository.countByCustomerId(customer.getId());
         if (accountCount >= ACCOUNT_LIMIT_COUNT) {
             throw new AccountCreateException("Customer has reached account limit");
+        }
+
+        if (accountDto.balance().compareTo(BigDecimal.ZERO) < 0) {
+            throw new AccountCreateException("Initial balance cannot be negative");
         }
 
         Account account = new Account(customer, accountDto.currency(), accountDto.accountName(),

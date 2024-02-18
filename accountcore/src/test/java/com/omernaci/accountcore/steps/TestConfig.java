@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package com.omernaci.accountcore.runner;
+package com.omernaci.accountcore.steps;
 
-import io.cucumber.junit.Cucumber;
-import io.cucumber.junit.CucumberOptions;
-import org.junit.runner.RunWith;
+import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureMockRestServiceServer;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
 
-@RunWith(Cucumber.class)
-@CucumberOptions(
-        features = "src/test/resources/features",
-        glue = "com.omernaci.accountcore.steps",
-        snippets = CucumberOptions.SnippetType.CAMELCASE,
-        plugin = {"pretty", "html:target/cucumber-reports/cucumber-pretty.html",
-                "json:target/cucumber-reports/CucumberTestReport.json",
-                "rerun:target/cucumber-reports/rerun.txt"},
-        tags = "not @Skip"
-)
-public class CucumberTest {
+@TestConfiguration
+@AutoConfigureMockRestServiceServer
+public class TestConfig {
+
+    @Bean
+    public TestRestTemplate testRestTemplate(RestTemplateBuilder builder) {
+        return new TestRestTemplate(builder);
+    }
 }

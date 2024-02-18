@@ -16,7 +16,9 @@
 
 package com.omernaci.accountcore.steps;
 
-import com.omernaci.accountcore.persistence.entity.Account;
+import com.omernaci.accountcore.exception.AccountCreateException;
+import com.omernaci.accountcore.persistence.entity.AccountStatus;
+import com.omernaci.accountcore.persistence.entity.AccountType;
 import com.omernaci.accountcore.persistence.entity.Customer;
 import com.omernaci.accountcore.persistence.entity.CustomerType;
 import com.omernaci.accountcore.persistence.repository.AccountRepository;
@@ -24,23 +26,18 @@ import com.omernaci.accountcore.persistence.repository.CustomerRepository;
 import com.omernaci.accountcore.service.AccountService;
 import com.omernaci.accountcore.service.dto.AccountDto;
 import com.omernaci.accountcore.service.impl.AccountServiceImpl;
+import io.cucumber.java.ParameterType;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.cucumber.spring.CucumberContextConfiguration;
+import java.math.BigDecimal;
 import java.util.Optional;
-import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@CucumberContextConfiguration
 public class AccountOpeningSteps {
 
     AccountRepository accountRepository = mock(AccountRepository.class);
@@ -48,8 +45,7 @@ public class AccountOpeningSteps {
     AccountService accountService;
 
     private Customer customer;
-    private Exception exception;
-    private boolean eligibleForAccountOpening;
+    private boolean success;
 
     @Given("I have an AccountService")
     public void iHaveAnAccountService() {
@@ -62,43 +58,38 @@ public class AccountOpeningSteps {
         when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
     }
 
-    @Given("the customer has {int} existing account\\(s)")
-    public void theCustomerHasExistingAccountS(Integer existingAccountCount) {
+    @And("the customer has {int} account")
+    public void theCustomerHasAccount(int existingAccountCount) {
         when(accountRepository.countByCustomerId(customer.getId())).thenReturn(existingAccountCount);
     }
 
-    @When("the customer opens a new account using AccountService")
-    public void theCustomerOpensANewAccountUsingAccountService() {
+    @When("an account is opened with currency {string}, name {string}, balance {double}, type {string}, and status {string}")
+    public void anAccountIsOpenedWithCurrencyNameBalanceTypeAndStatus(String currency, String accountName, double balance, String accountType, String accountStatus) {
+        AccountDto accountDto = AccountDto.builder()
+            .customerId(customer.getId())
+            .currency(currency)
+            .accountName(accountName)
+            .balance(BigDecimal.valueOf(balance))
+            .accountType(AccountType.valueOf(accountType))
+            .accountStatus(AccountStatus.valueOf(accountStatus))
+            .build();
+
         try {
-            exception = null;
-            AccountDto accountDto = AccountDto.builder()
-                .customerId(customer.getId())
-                .build();
-
             accountService.openAccount(accountDto);
-            eligibleForAccountOpening = true;
-        } catch (Exception e) {
-            exception = e;
-            eligibleForAccountOpening = false;
+            success = true;
+        } catch (AccountCreateException e) {
+            success = false;
         }
     }
 
-    @Then("the account should be created successfully if eligible")
-    public void theAccountShouldBeCreatedSuccessfullyIfEligible() {
-        if (eligibleForAccountOpening) {
-            verify(accountRepository, times(1)).save(any(Account.class));
-        } else {
-            verify(accountRepository, times(0)).save(any(Account.class));
-        }
+    @Then("the account should be created {boolean}")
+    public void theAccountShouldBeCreated(boolean expectedSuccess) {
+        assertEquals(expectedSuccess, success);
     }
 
-    @Then("an exception should be thrown if not eligible")
-    public void anExceptionShouldBeThrownIfNotEligible() {
-        if (eligibleForAccountOpening) {
-            assertNull(exception);
-        } else {
-            assertNotNull(exception);
-        }
+    @ParameterType(name = "boolean", value = "true|false")
+    public boolean booleanValue(String value) {
+        return Boolean.parseBoolean(value);
     }
 
 }
