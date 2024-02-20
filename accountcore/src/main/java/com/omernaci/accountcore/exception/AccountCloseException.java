@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package com.omernaci.accountcore.service;
+package com.omernaci.accountcore.exception;
 
-import com.omernaci.accountcore.service.dto.AccountClosingDto;
-import com.omernaci.accountcore.service.dto.AccountDto;
-import com.omernaci.accountcore.service.dto.ApiResponse;
+public class AccountCloseException extends RuntimeException {
 
-public interface AccountService {
-
-    void openAccount(AccountDto accountDto);
-
-    ApiResponse closeAccount(AccountClosingDto accountClosingDto);
+    public AccountCloseException(String message) {
+        super(message);
+    }
 
 }

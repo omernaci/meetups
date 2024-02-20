@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-package com.omernaci.accountcore.service;
+package com.omernaci.accountcore.service.dto;
 
-import com.omernaci.accountcore.service.dto.AccountClosingDto;
-import com.omernaci.accountcore.service.dto.AccountDto;
-import com.omernaci.accountcore.service.dto.ApiResponse;
+import java.time.LocalDate;
 
-public interface AccountService {
-
-    void openAccount(AccountDto accountDto);
-
-    ApiResponse closeAccount(AccountClosingDto accountClosingDto);
-
-}
+public record AccountClosingDto (Long accountId, LocalDate closedDate) { }

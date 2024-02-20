@@ -17,7 +17,9 @@
 package com.omernaci.accountcore.api;
 
 import com.omernaci.accountcore.service.AccountService;
+import com.omernaci.accountcore.service.dto.AccountClosingDto;
 import com.omernaci.accountcore.service.dto.AccountDto;
+import com.omernaci.accountcore.service.dto.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,6 +40,12 @@ public class AccountController {
     public ResponseEntity<String> openAccount(@RequestBody AccountDto accountDto) {
         accountService.openAccount(accountDto);
         return ResponseEntity.ok("Account opened successfully");
+    }
+
+    @PostMapping("/{accountId}/close")
+    public ResponseEntity<String> closeAccount(@RequestBody AccountClosingDto accountClosingDto) {
+        ApiResponse response = accountService.closeAccount(accountClosingDto);
+        return ResponseEntity.ok(response.getMessage());
     }
 
 }

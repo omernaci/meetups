@@ -14,16 +14,33 @@
  * limitations under the License.
  */
 
-package com.omernaci.accountcore.service;
+package com.omernaci.accountcore.service.dto;
 
-import com.omernaci.accountcore.service.dto.AccountClosingDto;
-import com.omernaci.accountcore.service.dto.AccountDto;
-import com.omernaci.accountcore.service.dto.ApiResponse;
+public class ApiResponse {
 
-public interface AccountService {
+    private boolean success;
+    private String message;
 
-    void openAccount(AccountDto accountDto);
+    public ApiResponse() { }
 
-    ApiResponse closeAccount(AccountClosingDto accountClosingDto);
+    public ApiResponse(boolean success, String message) {
+        this.success = success;
+        this.message = message;
+    }
 
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }
