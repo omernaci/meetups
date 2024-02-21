@@ -26,13 +26,18 @@ import com.omernaci.accountcore.persistence.repository.CustomerRepository;
 import com.omernaci.accountcore.service.AccountService;
 import com.omernaci.accountcore.service.dto.AccountDto;
 import com.omernaci.accountcore.service.impl.AccountServiceImpl;
+import io.cucumber.java.Before;
 import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.cucumber.java.tr.Diyelimki;
+import io.cucumber.java.tr.Eğerki;
+import io.cucumber.java.tr.Ozaman;
 import java.math.BigDecimal;
 import java.util.Optional;
+import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -47,6 +52,48 @@ public class AccountOpeningSteps {
     private Customer customer;
     private boolean success;
 
+    @Before
+    public void setUp() {
+        accountService = new AccountServiceImpl(accountRepository, customerRepository);
+    }
+
+    @Diyelimki("Verilen {long} numarali musterinin tipi {string} olsun")
+    public void verilenNumaraliMusterininTipiOlsun(Long customerId, String customerType) {
+        customer = new Customer(customerId, CustomerType.valueOf(customerType));
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+    }
+
+    @Eğerki("{string} para biriminden, adi {string}, bakiyesi {double}, tipi {string}, durumu {string} olan hesap acilmak istenirse")
+    public void paraBirimindenAdıBakiyesiTipiDurumuOlanHesapAcilmakIstenirse(String currency, String accountName, double balance, String accountType, String accountStatus) {
+        AccountDto accountDto = AccountDto.builder()
+            .customerId(customer.getId())
+            .currency(currency)
+            .accountName(accountName)
+            .balance(BigDecimal.valueOf(balance))
+            .accountType(AccountType.valueOf(accountType))
+            .accountStatus(AccountStatus.valueOf(accountStatus))
+            .build();
+
+        try {
+            accountService.openAccount(accountDto);
+            success = true;
+        } catch (AccountCreateException e) {
+            success = false;
+        }
+    }
+
+    @Ozaman("hesap {boolean} sekilde olusturulmalidir.")
+    public void hesapSuccessSekildeOlusturulmalidir(boolean expectedSuccess) {
+        assertEquals(expectedSuccess, success);
+    }
+
+    @ParameterType(name = "boolean", value = "true|false")
+    public boolean booleanValue(String value) {
+        return Boolean.parseBoolean(value);
+    }
+
+
+    /*
     @Given("I have an AccountService")
     public void iHaveAnAccountService() {
         accountService = new AccountServiceImpl(accountRepository, customerRepository);
@@ -91,5 +138,5 @@ public class AccountOpeningSteps {
     public boolean booleanValue(String value) {
         return Boolean.parseBoolean(value);
     }
-
+*/
 }
